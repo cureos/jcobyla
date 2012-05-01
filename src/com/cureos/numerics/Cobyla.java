@@ -30,10 +30,18 @@ package com.cureos.numerics;
  */
 public class Cobyla
 {    
-    private static String IterationResultFormatter = "%nNFVALS = %1$5d   F = %2$13.6f    MAXCV = %3$13.6e%n";
-
-    public static CobylaExitStatus FindMinimum(final Calcfc calcfc, int n, int m, double[] x, 
-            double rhobeg, double rhoend, int iprint, int maxfun)
+    /**
+     *
+     * @param calcfc the value of calcfc
+     * @param n the value of n
+     * @param m the value of m
+     * @param x the value of x
+     * @param rhobeg the value of rhobeg
+     * @param rhoend the value of rhoend
+     * @param iprint the value of iprint
+     * @param maxfun the value of maxfun
+     */
+    public static CobylaExitStatus FindMinimum(final Calcfc calcfc, int n, int m, double[] x, double rhobeg, double rhoend, int iprint, int maxfun)
     {
         //     This subroutine minimizes an objective function F(X) subject to M
         //     inequality constraints on X, where X is a vector of variables that has
@@ -135,7 +143,9 @@ public class Cobyla
         double gamma = 0.5;
         double delta = 1.1;
 
-        double f, resmax, total;
+        double f = 0.0;
+        double resmax = 0.0; 
+        double total;
 
         int np = n + 1;
         int mp = m + 1;
@@ -194,8 +204,7 @@ public class Cobyla
 
             if (nfvals == iprint - 1 || iprint == 3)
             {
-                System.out.format(IterationResultFormatter, nfvals, f, resmax);
-                System.out.format("X = %s%n", FORMAT(PART(x, 1, n)));
+                PrintIterationResult(nfvals, f, resmax, x, n);
             }
 
             con[mp] = f;
@@ -606,11 +615,8 @@ public class Cobyla
                 }
                 if (iprint >= 2)
                     System.out.format("%nReduction in RHO to %1$13.6f  and PARMU = %2$13.6f%n", rho, parmu);
-                if (iprint == 2)
-                {
-                    System.out.format(IterationResultFormatter, nfvals, datmat[mp][np], datmat[mpp][np]);
-                    System.out.format("X = %s%n", FORMAT(PART(COL(sim, np), 1, n)));
-                }
+                if (iprint == 2) 
+                    PrintIterationResult(nfvals, datmat[mp][np], datmat[mpp][np], COL(sim, np), n);
 
             } while (true);
         } while (true);
@@ -619,7 +625,11 @@ public class Cobyla
         {
             case Normal:
                 if (iprint >= 1) System.out.format("%nNormal return from subroutine COBYLA%n");
-                if (ifull) return status;
+                if (ifull)
+                {
+                    if (iprint >= 1) PrintIterationResult(nfvals, f, resmax, x, n);
+                    return status;
+                }
                 break;
             case MaxIterationsReached:
                 if (iprint >= 1)
@@ -634,12 +644,7 @@ public class Cobyla
         for (int k = 1; k <= n; ++k) x[k] = sim[k][np];
         f = datmat[mp][np];
         resmax = datmat[mpp][np];
-        
-        if (iprint >= 1)
-        {
-            System.out.format(IterationResultFormatter, nfvals, f, resmax);
-            System.out.format("X = %s%n", FORMAT(PART(x, 1, n)));
-        }
+        if (iprint >= 1) PrintIterationResult(nfvals, f, resmax, x, n);
         
         return status;
     }
@@ -1162,8 +1167,13 @@ public class Cobyla
 
         return false;
     }
-    
-    
+        
+    private static void PrintIterationResult(int nfvals, double f, double resmax, double[] x, int n)
+    {
+        System.out.format("%nNFVALS = %1$5d   F = %2$13.6f    MAXCV = %3$13.6e%n", nfvals, f, resmax);
+        System.out.format("X = %s%n", FORMAT(PART(x, 1, n)));
+    }
+
     private static double[] ROW(double[][] src, int rowidx)
     {
         int cols = src[0].length;
