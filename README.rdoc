@@ -33,7 +33,7 @@ Implement the interface explicitly or anonymously. The _Compute_ method exhibits
 where _n_ is the number of variables, _m_ is the number of constraints, _x_ is the variable array, and _con_ is the array of calculated constraints 
 function values. The method should return the value of the objective function.
 
-To minimize the objective function subject to constraints, call the static _Cobyla.FindMinimum_ methods:
+To minimize the objective function subject to constraints, call the static _Cobyla.FindMinimum_ method:
 
     CobylaExitStatus FindMinimum(Calcfc calcfc, int n, int m, double[] x, 
                       double rhobeg, double rhoend, int iprint, int maxfun);
@@ -42,6 +42,8 @@ where _x_ on input is the initial variable array, _rhobeg_ and _rhoend_ are the 
 specifies the level of output to the console, and _maxfun_ is the maximum allowed number of function evaluations. On output _x_ is the 
 optimal obtained variable values. The method returns final optimization status, which is one of normal termination, maximum iterations 
 reached or diverging rounding errors.
+
+For usage examples with anonymous interface implementations, please review the _CobylaTest.java_ file in the _test_ folder.
 
 ==The MIT License
 
@@ -61,4 +63,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ==Revision history
 
+* May 2, 2012: Reference to usage examples.
 * May 1, 2012: Initial document.

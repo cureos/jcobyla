@@ -25,21 +25,38 @@
 package com.cureos.numerics;
 
 /**
- *
- * @author anders
+ * Constrained Optimization BY Linear Approximation in Java.
+ * 
+ * COBYLA2 is an implementation of Powell’s nonlinear derivative–free constrained optimization that uses 
+ * a linear approximation approach. The algorithm is a sequential trust–region algorithm that employs linear
+ * approximations to the objective and constraint functions, where the approximations are formed by linear
+ * interpolation at n + 1 points in the space of the variables and tries to maintain a regular–shaped simplex 
+ * over iterations.
+ * 
+ * It solves nonsmooth NLP with a moderate number of variables (about 100). Inequality constraints only.
+ * 
+ * The initial point X is taken as one vertex of the initial simplex with zero being another, so, X should
+ * not be entered as the zero vector.
+ * 
+ * @author Anders Gustafsson, Cureos AB.
  */
 public class Cobyla
 {    
     /**
-     *
-     * @param calcfc the value of calcfc
-     * @param n the value of n
-     * @param m the value of m
-     * @param x the value of x
-     * @param rhobeg the value of rhobeg
-     * @param rhoend the value of rhoend
-     * @param iprint the value of iprint
-     * @param maxfun the value of maxfun
+     * Minimizes the objective function F with respect to a set of inequality constraints CON,
+     * and returns the optimal variable array. F and CON may be non-linear, and should preferably be smooth.
+     * 
+     * @param calcfc Interface implementation for calculating objective function and constraints.
+     * @param n Number of variables.
+     * @param m Number of constraints.
+     * @param x On input initial values of the variables (zero-based array). On output
+     * optimal values of the variables obtained in the COBYLA minimization.
+     * @param rhobeg Initial size of the simplex.
+     * @param rhoend Final value of the simplex.
+     * @param iprint Print level, 0 &lt;= iprint &lt;= 3, where 0 provides no output and
+     * 3 provides full output to the console.
+     * @param maxfun Maximum number of function evaluations before terminating.
+     * @return Exit status of the COBYLA2 optimization.
      */
     public static CobylaExitStatus FindMinimum(final Calcfc calcfc, int n, int m, double[] x, double rhobeg, double rhoend, int iprint, int maxfun)
     {
@@ -97,13 +114,21 @@ public class Cobyla
         int mpp = m + 2;
 
         // Internal base-1 X array
-        double[] xio = new double[n + 1];
-        System.arraycopy(x, 0, xio, 1, n);
+        double[] iox = new double[n + 1];
+        System.arraycopy(x, 0, iox, 1, n);
 
         // Internal representation of the objective and constraints calculation method, 
         // accounting for that X and CON arrays in the cobylb method are base-1 arrays.
         Calcfc fcalcfc = new Calcfc()
         {
+            /**
+             *
+             * @param n the value of n
+             * @param m the value of m
+             * @param x the value of x
+             * @param con the value of con
+             * @return the double
+             */
             @Override
             public double Compute(int n, int m, double[] x, double[] con)
             {
@@ -116,8 +141,8 @@ public class Cobyla
             }
         };                
 
-        CobylaExitStatus status = cobylb(fcalcfc, n, m, mpp, xio, rhobeg, rhoend, iprint, maxfun);
-        System.arraycopy(xio, 1, x, 0, n);
+        CobylaExitStatus status = cobylb(fcalcfc, n, m, mpp, iox, rhobeg, rhoend, iprint, maxfun);
+        System.arraycopy(iox, 1, x, 0, n);
 
         return status;
     }
