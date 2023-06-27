@@ -1075,7 +1075,7 @@ public class Cobyla
                     {
                         double acca = step + 0.1 * resmax;
                         double accb = step + 0.2 * resmax;
-                        if (step >= acca || acca >= accb) break L_70;
+                        if (step >= acca || acca >= accb) continue L_60;
                         step = Math.min(step, resmax);
                     }
 
